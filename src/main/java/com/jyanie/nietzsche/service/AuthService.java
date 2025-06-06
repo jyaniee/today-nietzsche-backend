@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 
@@ -16,7 +18,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
-    public String login(LoginRequest request){
+    public Map<String, String> login(LoginRequest request){
         System.out.println("🧪 passwordEncoder 클래스: " + passwordEncoder.getClass().getName());
         System.out.println("🔑 [로그인 요청 도착] email=" + request.getEmail());
         User user = userRepository.findByEmail(request.getEmail())
@@ -28,6 +30,12 @@ public class AuthService {
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw  new RuntimeException("비밀번호가 일치하지 않습니다.");
         }
-        return jwtUtil.createToken(user.getEmail());
+
+        String token = jwtUtil.createToken(user.getEmail());
+
+        return Map.of(
+                "token",token,
+                "name", user.getName()
+        );
     }
 }
