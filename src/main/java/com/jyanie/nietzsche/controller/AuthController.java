@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.Authentication;
 import java.util.Map;
 
 @RestController
@@ -37,23 +37,28 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest){
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
         log.info("[회원가입 요청 도착] email = {}", signupRequest.getEmail());
 
-        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", "이미 존재하는 이메일입니다."));
+        try {
+            authService.signup(signupRequest);
+            return ResponseEntity.ok(Map.of("message", "회원가입 성공"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "서버 오류"));
+        }
+    }
+    @GetMapping("/me")
+    public ResponseEntity<?> getMyInfo(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "인증되지 않은 사용자입니다."));
         }
 
-        String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
-
-        User newUser = User.builder()
-                .email(signupRequest.getEmail())
-                .password(encodedPassword)
-                .name(signupRequest.getName())
-                .build();
-        
-        userRepository.save(newUser);
-        
-        return ResponseEntity.ok(Map.of("message", "회원가입 성공"));
+        User user = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(Map.of(
+                "email", user.getEmail(),
+                "name", user.getName()
+        ));
     }
 }

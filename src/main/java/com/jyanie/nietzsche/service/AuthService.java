@@ -1,6 +1,7 @@
 package com.jyanie.nietzsche.service;
 
 import com.jyanie.nietzsche.dto.LoginRequest;
+import com.jyanie.nietzsche.dto.SignupRequest;
 import com.jyanie.nietzsche.entity.User;
 import com.jyanie.nietzsche.repository.UserRepository;
 import com.jyanie.nietzsche.security.JwtUtil;
@@ -37,5 +38,30 @@ public class AuthService {
                 "token",token,
                 "name", user.getName()
         );
+    }
+
+    public void signup(SignupRequest signupRequest) {
+        System.out.println("🔐 [회원가입 요청 도착]");
+        System.out.println("📨 입력된 이메일: " + signupRequest.getEmail());
+        System.out.println("📨 입력된 이름: " + signupRequest.getName());
+        System.out.println("📨 입력된 비밀번호: " + signupRequest.getPassword());
+
+        if (userRepository.findByEmail(signupRequest.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
+        }
+
+        String encodedPassword = passwordEncoder.encode(signupRequest.getPassword());
+
+        System.out.println("🔒 비밀번호 암호화 완료");
+        System.out.println("🔐 암호화된 비밀번호 해시: " + encodedPassword);
+
+        User newUser = User.builder()
+                .email(signupRequest.getEmail())
+                .password(encodedPassword)
+                .name(signupRequest.getName())
+                .build();
+
+        userRepository.save(newUser);
+        System.out.println("✅ 회원가입 성공 - 저장된 유저: " + newUser.getEmail());
     }
 }
