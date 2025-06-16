@@ -29,7 +29,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable()) // csrf 비활성화
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login", "/api/signup").permitAll() // 로그인 경로 허용
+                        .requestMatchers("/api/login", "/api/signup", "api/quotes/**").permitAll() // 로그인 경로 허용
                         .anyRequest().authenticated()  // 그외는 인증 필요
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
