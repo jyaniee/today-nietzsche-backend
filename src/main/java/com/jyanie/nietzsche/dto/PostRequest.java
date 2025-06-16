@@ -9,4 +9,5 @@ import lombok.Setter;
 public class PostRequest {
     private String title;
     private String content;
+    private String category;
 }

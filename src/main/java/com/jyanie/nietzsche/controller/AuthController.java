@@ -4,6 +4,7 @@ import com.jyanie.nietzsche.dto.LoginRequest;
 import com.jyanie.nietzsche.dto.SignupRequest;
 import com.jyanie.nietzsche.entity.User;
 import com.jyanie.nietzsche.repository.UserRepository;
+import com.jyanie.nietzsche.security.CustomUserDetails;
 import com.jyanie.nietzsche.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,9 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "인증되지 않은 사용자입니다."));
         }
 
-        User user = (User) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
         return ResponseEntity.ok(Map.of(
                 "email", user.getEmail(),
                 "name", user.getName()
