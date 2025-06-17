@@ -6,6 +6,7 @@ import com.jyanie.nietzsche.dto.PostListResponse;
 import com.jyanie.nietzsche.entity.Post;
 import com.jyanie.nietzsche.entity.User;
 import com.jyanie.nietzsche.repository.CommentRepository;
+import com.jyanie.nietzsche.repository.PostLikeRepository;
 import com.jyanie.nietzsche.repository.PostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final PostLikeRepository postLikeRepository;
 
     public Post createPost(PostRequest request, User user){
         Post post = Post.builder()
@@ -42,8 +44,9 @@ public class PostService {
 
         return posts.stream()
                 .map(post -> {
+                    int likeCount = postLikeRepository.countByPostId(post.getId()); // 좋아요 수 가져오기
                     int count = commentRepository.countByPostId(post.getId()); // 댓글 수 가져오기
-                    return PostListResponse.from(post, count);
+                    return PostListResponse.from(post, count, likeCount);
                 })
                 .toList();
     }

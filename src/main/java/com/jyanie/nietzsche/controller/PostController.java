@@ -6,11 +6,14 @@ import com.jyanie.nietzsche.dto.PostListResponse;
 import com.jyanie.nietzsche.entity.Post;
 import com.jyanie.nietzsche.entity.User;
 import com.jyanie.nietzsche.security.CustomUserDetails;
+import com.jyanie.nietzsche.service.PostLikeService;
 import com.jyanie.nietzsche.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     private final PostService postService;
+    private final PostLikeService postLikeService;
 
     @PostMapping("/posts")
     public ResponseEntity<?> createPost(@RequestBody PostRequest request, Authentication authentication) {
@@ -59,4 +63,23 @@ public class PostController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/posts/{postId}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable Long postId, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        boolean liked = postLikeService.toggleLike(postId, user);
+        int likeCount = postLikeService.getLikeCount(postId);
+
+        return ResponseEntity.ok(Map.of(
+                "liked", liked,
+                "likeCount", likeCount
+        ));
+    }
+
+    @GetMapping("/posts/{postId}/like-count")
+    public ResponseEntity<Integer> getLikeCount(@PathVariable Long postId) {
+        int count = postLikeService.getLikeCount(postId);
+        return ResponseEntity.ok(count);
+    }
 }
