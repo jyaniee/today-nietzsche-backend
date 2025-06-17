@@ -80,4 +80,12 @@ public class PostService {
 
         postRepository.delete(post);
     }
+
+    public Post getAndIncreaseViews(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        post.setViews(post.getViews() + 1);
+        return post;
+    }
 }

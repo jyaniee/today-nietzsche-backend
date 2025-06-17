@@ -42,7 +42,8 @@ public class PostController {
 
     @GetMapping("/posts/{id}")
     public ResponseEntity<PostDetailResponse> getPost(@PathVariable Long id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+        Post post = postService.getAndIncreaseViews(id);
+        return ResponseEntity.ok(PostDetailResponse.from(post));
     }
 
     @PutMapping("/posts/{id}")
