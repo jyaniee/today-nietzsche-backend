@@ -41,5 +41,22 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    @PutMapping("/posts/{id}")
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostRequest request, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        postService.updatePost(id, request, user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<?> deletePost(@PathVariable Long id, Authentication authentication) {
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
+
+        postService.deletePost(id, user);
+        return ResponseEntity.noContent().build();
+    }
 
 }

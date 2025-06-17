@@ -17,6 +17,7 @@ public class PostDetailResponse {
     private int views;
     private int likes;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public static PostDetailResponse from(Post post) {
         return PostDetailResponse.builder()
@@ -28,6 +29,7 @@ public class PostDetailResponse {
                 .views(post.getViews())
                 .likes(post.getLikes())
                 .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .build();
     }
 }
