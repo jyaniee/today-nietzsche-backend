@@ -22,9 +22,10 @@ public class PostListResponse {
     private String authorName;
     private int views;
     private int likes;
+    private int commentCount;
     private LocalDateTime createdAt;
 
-    public static PostListResponse from(Post post) {
+    public static PostListResponse from(Post post, int commentCount) {
         return PostListResponse.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -33,6 +34,7 @@ public class PostListResponse {
                 .views(post.getViews())
                 .likes(post.getLikes())
                 .createdAt(post.getCreatedAt())
+                .commentCount(commentCount)
                 .build();
     }
 }
